@@ -69,8 +69,8 @@ open class NotionDatabase(
     }
 
     suspend fun query(
+            sort: PropertySort.() -> Unit = {},
             query: DatabaseQuery.() -> Unit,
-            sort: PropertySort.() -> Unit,
     ): List<Page> {
         return client.queryDatabase(
             id = this.id,
