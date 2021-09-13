@@ -89,7 +89,7 @@ open class NotionDatabase(
         return client.updatePage(id, PropertyValueList().apply(properties))
     }
 
-    suspend fun addContentToPage(id: String, block: MutableBlockList.() -> Unit) {
-        client.addContentToPage(id, block)
+    suspend fun appendPageContent(id: String, block: MutableBlockList.() -> Unit) {
+        client.appendPageContent(id, block)
     }
 }
