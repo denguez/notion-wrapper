@@ -49,22 +49,28 @@ open class NotionDatabase(
     init {
         val config = DatabaseConfig().apply(databaseBuilder)
         id = runBlocking {
-            val db = DatabaseEntity.finByName(config.name)
-            if (db == null) {
-                val notiondb = client.createDatabase(
+            var notiondb = client.searchDatabases(config.name).firstOrNull()
+            if (notiondb == null) {
+                notiondb = client.createDatabase(
                     parentId = config.parentId,
                     title = RichTextList().text(config.name),
                     props = config.propList
                 )
+            }
+
+            val db = DatabaseEntity.finByName(config.name)
+            if (db == null) {
                 DatabaseEntity.create {
                     name = config.name
                     parentId = config.parentId
                     databaseId = notiondb.id
                 }
-                notiondb.id
             } else {
-                db.databaseId
+                DatabaseEntity.update(db) { 
+                    databaseId = notiondb.id
+                }
             }
+            notiondb.id
         }
     }
 
@@ -84,6 +90,6 @@ open class NotionDatabase(
     }
 
     suspend fun addContentToPage(id: String, block: MutableBlockList.() -> Unit) {
-        return client.addContentToPage(id, block)
+        client.addContentToPage(id, block)
     }
 }
